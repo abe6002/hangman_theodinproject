@@ -2,24 +2,27 @@
 
 class Player
 
-    attr_accessor :guesses
+    attr_accessor :guesses, :name, :attempts
 
     def initialize(name)
         @name = name
-        @turn = true
         @guesses = []
+        @attempts = 6
     end
 
-    def valid_guess?(guess) #need to return something indicating false
+    def valid_guess?(guess) 
         alpha = ("a".."z").to_a
         !@guesses.include?(guess) && alpha.include?(guess)
     end
 
-    def guess? #need to return something indicating false
+    def guess?
         puts "#{@name}, enter your guess:"
         guess = gets.to_s.downcase.chomp
         if valid_guess?(guess)
             @guesses << guess
+        else
+            puts "That is not a valid guess."
+            self.guess?
         end
 
         self.guesses.last
