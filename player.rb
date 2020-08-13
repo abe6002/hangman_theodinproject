@@ -12,13 +12,13 @@ class Player
 
     def valid_guess?(guess) 
         alpha = ("a".."z").to_a
-        !@guesses.include?(guess) && alpha.include?(guess)
+        (!@guesses.include?(guess) && alpha.include?(guess)) || guess == "solve" #allows solve to be "guessed" as many times as you want
     end
 
     def guess?
         puts "#{@name}, enter your guess:"
         guess = gets.to_s.downcase.chomp
-        if valid_guess?(guess)
+        if valid_guess?(guess) 
             @guesses << guess
         else
             puts "That is not a valid guess."

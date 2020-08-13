@@ -18,44 +18,56 @@ class Board
     attr_accessor :attempts, :board, :current_player, :player, :computer
 
     def initialize(player_name)
-        @word = File.readlines("5desk.txt").sample.chomp
+        @word = File.readlines("5desk.txt").sample.downcase.chomp
         @player = Player.new(player_name)
         @computer = Computer.new
-        @current_player = @player.name
+        @current_player = @player
         @board = ""
 
         @word.each_char {|char| @board += "_"}
     end
 
-    def check_for_letter
-        letter = @player.guess?
+    def check_for_letter #need to add functionality for "solve" and make another method for it.
+        if @current_player == @player
 
-        if @word.include?(letter)
-            idx = @word.index(letter)
-            @board[idx] = letter
-        else
-            @attempts -= 1
+            letter = @player.guess?
+
+            if @word.include?(letter)
+                @word.each_char.with_index {|char, idx| @board[idx] = letter if char == letter}
+            else
+                @current_player.attempts -= 1
+            end
+
+        else #if current_player is the computer
+
+            letter = @computer.comp_guess
+
+            if @word.include?(letter)
+                @word.each_char.with_index {|char, idx| @board[idx] = letter if char == letter}
+            else
+                @current_player.attempts -= 1
+            end
         end
 
         self.print
     end
 
     def print
-        puts "Word: #{@board} \nGuesses Remaining: #{@attempts}"
+        puts "Word: #{@board} \nGuesses Remaining: #{@current_player.attempts}"
     end
 
-    def win? #not done - need to make it current player - UNTESTED
+    def win? 
         if @board == @word
-            puts "Player wins game!"
+            puts "#{@current_player.name} wins game!"
             return true
         end
 
         false
     end
 
-    def lose? #UNTESTED
-        if @attempts == 0
-            puts "Player loses the game :(" 
+    def lose?
+        if @current_player.attempts == 0
+            puts "#{@current_player.name} loses the game :(" 
             return true
         end
 
@@ -63,10 +75,10 @@ class Board
     end
 
     def switch_turns
-        if @player.name == @current_player
-            return @current_player = @computer.name
+        if @player == @current_player
+            return @current_player = @computer
         else
-            @current_player = @player.name
+            @current_player = @player
         end
     end
 

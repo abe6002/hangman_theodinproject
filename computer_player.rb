@@ -19,4 +19,7 @@ class Computer
 
         self.guesses.last
     end
+
+    #could make "AI"-ish solve based on letters guessed, length, and words in dictionary
+
 end
