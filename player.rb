@@ -12,7 +12,7 @@ class Player
 
     def valid_guess?(guess) 
         alpha = ("a".."z").to_a
-        (!@guesses.include?(guess) && alpha.include?(guess)) || guess == "solve" #allows solve to be "guessed" as many times as you want
+        (!@guesses.include?(guess) && alpha.include?(guess)) || guess == "solve" || guess == "save" #allows solve to be "guessed" as many times as you want, and game to be saved
     end
 
     def guess?

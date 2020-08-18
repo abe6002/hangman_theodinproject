@@ -12,6 +12,7 @@
 
 require_relative "player"
 require_relative "computer_player"
+require "yaml"
 
 class Board
 
@@ -27,26 +28,54 @@ class Board
         @word.each_char {|char| @board += "_"}
     end
 
-    def check_for_letter #need to add functionality for "solve" and make another method for it.
+    def check_letter(letter)
+        if @word.include?(letter)
+            @word.each_char.with_index {|char, idx| @board[idx] = letter if char == letter}
+        else
+            puts "There are no #{letter}'s in this word - sorry!"
+            @current_player.attempts -= 1
+        end
+    end
+    
+    def check_word
+        puts "Guess the complete word:"
+        word_guess = gets.downcase.chomp
+        if word_guess == @word
+            puts "#{@current_player.name} wins game!" #not sure if this is the right spot for this
+            return true
+        else
+            puts "Wrong guess!"
+            @current_player.attempts -=1
+        end
+    end
+
+    def save_game
+        file_as = "#{@computer.name}.yml"
+        save = [@word, @player, @computer, @current_player, @board]
+    
+        f = File.open ( file_as , w)
+        YAML.dump(save, f)
+        f.close
+    end
+
+    def check_guess #need to add functionality for "save" and make another method for it.
         if @current_player == @player
 
-            letter = @player.guess?
+            guess = @player.guess?
 
-            if @word.include?(letter)
-                @word.each_char.with_index {|char, idx| @board[idx] = letter if char == letter}
+            if guess == "solve"
+                self.check_word
+            elsif guess == "save"
+                self.save_game
             else
-                @current_player.attempts -= 1
+                check_letter(guess)
             end
-
-        else #if current_player is the computer
-
+            
+        else
             letter = @computer.comp_guess
 
-            if @word.include?(letter)
-                @word.each_char.with_index {|char, idx| @board[idx] = letter if char == letter}
-            else
-                @current_player.attempts -= 1
-            end
+            puts "#{@computer.name} the Computer guesses #{letter}"
+            check_letter(letter)
         end
 
         self.print
