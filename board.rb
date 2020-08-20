@@ -14,9 +14,10 @@ require_relative "player"
 require_relative "computer_player"
 require "yaml"
 
+
 class Board
 
-    attr_accessor :attempts, :board, :current_player, :player, :computer
+    attr_accessor :attempts, :board, :current_player, :player, :computer, :word
 
     def initialize(player_name)
         @word = File.readlines("5desk.txt").sample.downcase.chomp
@@ -47,15 +48,6 @@ class Board
             puts "Wrong guess!"
             @current_player.attempts -=1
         end
-    end
-
-    def save_game
-        file_as = "#{@computer.name}.yml"
-        save = [@word, @player, @computer, @current_player, @board]
-    
-        f = File.open ( file_as , w)
-        YAML.dump(save, f)
-        f.close
     end
 
     def check_guess #need to add functionality for "save" and make another method for it.
@@ -111,5 +103,50 @@ class Board
         end
     end
 
+    def self.save_game(data)
+        puts "Type a name for your saved game"
+		game_name = gets.chomp
+        filename = "#{game_name}.yml"
+        Dir.mkdir('./saved_games') unless Dir.exists?('./saved_games')
+
+        ex_file = File.expand_path("./saved_games/#{filename}")
+        if File.exists?(ex_file)
+            puts "#{filename} already exists."
+            save_game(data)
+        else
+            File.open(ex_file, "w") do |f|
+                f.puts YAML::dump(data)
+                puts "Your game was saved as #{game_name}"
+            end
+        end
+    
+    end
+
+    def saved_games
+        @game_array = []
+        if Dir.glob("./saved_games/*").length > 0
+            Dir.glob("./saved_games/*").each do |file_name| 
+                @game_array << File.basename(filename, '.yml') #populates array with game names, removes the .yml
+            end
+
+            game_count = 1
+            @game_array.each do |game_path| #prints out a list of games and numbers, numbers 
+                p "#{game_count} - #{game_path}"
+                game_count += 1
+            end
+
+        choose_saved
+
+        else
+            puts "No saved games."
+        end
+
+    end
+
+    def choose_saved
+        puts "Which game would you like to play?"
+        @game_name = @game_array[gets.chomp.to_i - 1] #sets game_name to indexed file name, lots of room for errors if you dont guess int
+    end
+        
 
 end

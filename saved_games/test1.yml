@@ -1,0 +1,12 @@
+--- !ruby/object:Board
+word: stepfather
+player: &1 !ruby/object:Player
+  name: d
+  guesses: []
+  attempts: 6
+computer: !ruby/object:Computer
+  name: Doug
+  guesses: []
+  attempts: 6
+current_player: *1
+board: __________
