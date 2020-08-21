@@ -14,10 +14,9 @@ require_relative "player"
 require_relative "computer_player"
 require "yaml"
 
-
 class Board
 
-    attr_accessor :attempts, :board, :current_player, :player, :computer, :word
+    attr_accessor :board, :current_player, :player, :computer, :word
 
     def initialize(player_name)
         @word = File.readlines("5desk.txt").sample.downcase.chomp
@@ -58,7 +57,7 @@ class Board
             if guess == "solve"
                 self.check_word
             elsif guess == "save"
-                self.save_game
+                Board.save_game(self) #need to test if this works
             else
                 check_letter(guess)
             end
@@ -102,10 +101,10 @@ class Board
             @current_player = @player
         end
     end
-
+    
     def self.save_game(data)
         puts "Type a name for your saved game"
-		game_name = gets.chomp
+        game_name = gets.chomp
         filename = "#{game_name}.yml"
         Dir.mkdir('./saved_games') unless Dir.exists?('./saved_games')
 
@@ -119,14 +118,14 @@ class Board
                 puts "Your game was saved as #{game_name}"
             end
         end
-    
+
     end
 
-    def saved_games
+    def self.saved_games
         @game_array = []
         if Dir.glob("./saved_games/*").length > 0
             Dir.glob("./saved_games/*").each do |file_name| 
-                @game_array << File.basename(filename, '.yml') #populates array with game names, removes the .yml
+                @game_array << File.basename(file_name, '.yml') #populates array with game names, removes the .yml
             end
 
             game_count = 1
@@ -135,7 +134,7 @@ class Board
                 game_count += 1
             end
 
-        choose_saved
+        Board.choose_saved
 
         else
             puts "No saved games."
@@ -143,10 +142,22 @@ class Board
 
     end
 
-    def choose_saved
+    def self.choose_saved
         puts "Which game would you like to play?"
         @game_name = @game_array[gets.chomp.to_i - 1] #sets game_name to indexed file name, lots of room for errors if you dont guess int
     end
-        
+
+    def self.load_game #doesn't work - need to figure out a way to mutate current instance variables
+        Board.saved_games
+
+        board_state = YAML::load(File.read("./saved_games/#{@game_name}.yml"))
+
+        self.board = board_state.board
+        self.computer = board_state.computer
+        self.current_player = board_state.current_player
+        self.player = board_state.current_player
+        self.word = board_state.word
+
+    end
 
 end
